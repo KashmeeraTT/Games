@@ -265,6 +265,7 @@ void Game::handleBallPaddleCollision(Paddle& paddle, Constants::PaddleSide side)
                 ball.setPosition(directionX > 0 ? pBounds.left + pBounds.width : pBounds.left - bBounds.width, bBounds.top);
                 float hitPoint = bCenterY - pCenterY;
                 ball.setVelocity(directionX * ball.getSpeed(), (hitPoint / 60.0f) * ball.getSpeed());
+                ball.syncSpeed();
                 shakeTime = Constants::SHAKE_DURATION_HIT;
             } else {
                 // Hit the back face (ball passed paddle)

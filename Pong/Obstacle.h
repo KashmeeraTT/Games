@@ -6,7 +6,7 @@
 class Obstacle {
 public:
     Obstacle(float startX, float startY);
-    void update(float maxHeigth);
+    void update(float maxHeight);
     void draw(sf::RenderWindow& window) const;
     void reset(float startX, float startY);
     sf::FloatRect getBounds() const;

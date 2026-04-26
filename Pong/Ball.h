@@ -16,6 +16,7 @@ public:
     void reverseX();
     void setVelocity(float vx, float vy);
     void changeSpeed(float amount);
+    void syncSpeed();
     void move(float dx, float dy);
     void setPosition(float x, float y);
     sf::Vector2f getPosition() const;

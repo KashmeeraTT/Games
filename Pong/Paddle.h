@@ -6,8 +6,8 @@
 class Paddle {
 public:
     Paddle(float startX, float startY);
-    void updatePlayer(bool isUpPressed, bool isDownPressed, float maxHeigth);
-    void updateAI(float ballY, Constants::AIDifficulty difficulty, float maxHeigth);
+    void updatePlayer(bool isUpPressed, bool isDownPressed, float maxHeight);
+    void updateAI(float ballY, Constants::AIDifficulty difficulty, float maxHeight);
     void draw(sf::RenderWindow& window) const;
     void reset(float startX, float startY);
     sf::FloatRect getBounds() const;

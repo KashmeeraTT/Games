@@ -1,4 +1,5 @@
 #include "Ball.h"
+#include <cmath>
 
 Ball::Ball(float startX, float startY) : velX(0.0f), velY(0.0f), currentSpeed(Constants::DEFAULT_BALL_SPEED) {
     shape.setSize(sf::Vector2f(Constants::BALL_SIZE, Constants::BALL_SIZE));
@@ -39,6 +40,10 @@ void Ball::setVelocity(float vx, float vy) {
 
 void Ball::changeSpeed(float amount) {
     currentSpeed += amount;
+}
+
+void Ball::syncSpeed() {
+    currentSpeed = std::hypot(velX, velY);
 }
 
 void Ball::move(float dx, float dy) {
