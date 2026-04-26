@@ -2,6 +2,7 @@
 #include "Utils.h"
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 Game::Game(float w, float h, sf::RenderWindow& win) 
     : screenWidth(w), screenHeight(h), window(win),
@@ -175,7 +176,6 @@ void Game::update() {
 
         // Update Entities
         obstacle.update(screenHeight);
-        ball.update();
 
         // P1 Controls
         leftPaddle.updatePlayer(sf::Keyboard::isKeyPressed(sf::Keyboard::W), sf::Keyboard::isKeyPressed(sf::Keyboard::S), screenHeight);
@@ -187,7 +187,13 @@ void Game::update() {
             rightPaddle.updatePlayer(sf::Keyboard::isKeyPressed(sf::Keyboard::Up), sf::Keyboard::isKeyPressed(sf::Keyboard::Down), screenHeight);
         }
 
-        checkCollisions();
+        int substeps = static_cast<int>(std::ceil(ball.getSpeed() / 10.0f));
+        substeps = std::max(1, substeps);
+
+        for (int i = 0; i < substeps; i++) {
+            ball.update(1);
+            checkCollisions();
+        }
 
         // Scoring
         if (ball.getPosition().x < 0) {

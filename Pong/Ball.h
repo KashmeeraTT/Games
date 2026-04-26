@@ -6,7 +6,7 @@
 class Ball {
 public:
     Ball(float startX, float startY);
-    void update();
+    void update(int substeps = 1);
     void draw(sf::RenderWindow& window) const;
     void reset(float startX, float startY, float dX);
     sf::FloatRect getBounds() const;

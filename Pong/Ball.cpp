@@ -5,8 +5,12 @@ Ball::Ball(float startX, float startY) : velX(0.0f), velY(0.0f), currentSpeed(Co
     shape.setPosition(startX, startY);
 }
 
-void Ball::update() {
-    shape.move(velX, velY);
+void Ball::update(int substeps) {
+    float stepX = velX / substeps;
+    float stepY = velY / substeps;
+    for (int i = 0; i < substeps; i++) {
+        shape.move(stepX, stepY);
+    }
 }
 
 void Ball::draw(sf::RenderWindow& window) const {
