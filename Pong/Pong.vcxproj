@@ -148,6 +148,7 @@
     <ClInclude Include="Paddle.h" />
     <ClInclude Include="ScoreManager.h" />
     <ClInclude Include="UIManager.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

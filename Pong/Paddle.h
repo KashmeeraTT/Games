@@ -16,5 +16,4 @@ public:
 private:
     sf::RectangleShape shape;
     float playerSpeed;
-    float aiSpeed;
 };

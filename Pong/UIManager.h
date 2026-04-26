@@ -3,6 +3,10 @@
 #include <string>
 #include <vector>
 
+enum class MenuClick { NONE, ONE_PLAYER, TWO_PLAYER, HISTORY, QUIT };
+enum class DifficultyClick { NONE, EASY, MEDIUM, HARD };
+enum class GameOverClick { NONE, REMATCH, MENU };
+
 // UIManager.h - Rendering text and buttons
 class UIManager {
 public:
@@ -19,6 +23,19 @@ public:
     bool isHovering(const sf::Text& text, sf::Vector2i mousePos) const;
     void updateHoverState(sf::Text& text, sf::Vector2i mousePos) const;
 
+    MenuClick getMenuClick(sf::Vector2i mousePos) const;
+    DifficultyClick getDifficultyClick(sf::Vector2i mousePos) const;
+    GameOverClick getGameOverClick(sf::Vector2i mousePos) const;
+
+private:
+    const sf::Font& font;
+    float screenWidth;
+    float screenHeight;
+
+    sf::Text titleText;
+    sf::Text uiText;
+    sf::Text scoreText;
+
     sf::Text btn1Player;
     sf::Text btn2Player;
     sf::Text btnHistory;
@@ -30,15 +47,6 @@ public:
 
     sf::Text btnRematch;
     sf::Text btnMenu;
-
-private:
-    const sf::Font& font;
-    float screenWidth;
-    float screenHeight;
-
-    sf::Text titleText;
-    sf::Text uiText;
-    sf::Text scoreText;
 
     void centerTextX(sf::Text& text, float y);
 };

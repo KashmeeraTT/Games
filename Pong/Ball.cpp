@@ -56,3 +56,7 @@ sf::Vector2f Ball::getPosition() const {
 sf::Vector2f Ball::getVelocity() const {
     return sf::Vector2f(velX, velY);
 }
+
+float Ball::getSpeed() const {
+    return currentSpeed;
+}

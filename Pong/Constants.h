@@ -1,5 +1,4 @@
 #pragma once
-#include <SFML/Graphics.hpp>
 
 // Constants.h - Holds all magic numbers and configurations for the game
 namespace Constants {

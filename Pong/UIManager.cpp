@@ -75,6 +75,27 @@ void UIManager::updateHoverState(sf::Text& text, sf::Vector2i mousePos) const {
     text.setFillColor(isHovering(text, mousePos) ? sf::Color::Yellow : sf::Color::White);
 }
 
+MenuClick UIManager::getMenuClick(sf::Vector2i mousePos) const {
+    if (isHovering(btn1Player, mousePos)) return MenuClick::ONE_PLAYER;
+    if (isHovering(btn2Player, mousePos)) return MenuClick::TWO_PLAYER;
+    if (isHovering(btnHistory, mousePos)) return MenuClick::HISTORY;
+    if (isHovering(btnQuit, mousePos)) return MenuClick::QUIT;
+    return MenuClick::NONE;
+}
+
+DifficultyClick UIManager::getDifficultyClick(sf::Vector2i mousePos) const {
+    if (isHovering(btnEasy, mousePos)) return DifficultyClick::EASY;
+    if (isHovering(btnMedium, mousePos)) return DifficultyClick::MEDIUM;
+    if (isHovering(btnHard, mousePos)) return DifficultyClick::HARD;
+    return DifficultyClick::NONE;
+}
+
+GameOverClick UIManager::getGameOverClick(sf::Vector2i mousePos) const {
+    if (isHovering(btnRematch, mousePos)) return GameOverClick::REMATCH;
+    if (isHovering(btnMenu, mousePos)) return GameOverClick::MENU;
+    return GameOverClick::NONE;
+}
+
 void UIManager::drawMenu(sf::RenderWindow& window, sf::Vector2i mousePos) {
     updateHoverState(btn1Player, mousePos);
     updateHoverState(btn2Player, mousePos);
@@ -148,7 +169,14 @@ void UIManager::drawHistory(sf::RenderWindow& window, const std::vector<std::str
 }
 
 void UIManager::drawError(sf::RenderWindow& window, const std::string& message) {
+    sf::RectangleShape bg(sf::Vector2f(screenWidth, screenHeight));
+    bg.setFillColor(sf::Color(139, 0, 0)); // Dark red
+    window.draw(bg);
+
     sf::Text errorText;
-    // Don't use standard font here since this handles font loading failure visually.
-    // However, sfml requires a font. We handle it in main game loop before drawing.
+    errorText.setFont(font);
+    errorText.setCharacterSize(40);
+    errorText.setString(message + "\n\nPress Escape or close the window to exit.");
+    centerTextX(errorText, screenHeight / 2 - 50);
+    window.draw(errorText);
 }

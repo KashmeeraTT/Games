@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "Utils.h"
 #include <iostream>
 #include <cmath>
 
@@ -30,7 +31,7 @@ Game::Game(float w, float h, sf::RenderWindow& win)
         std::cerr << "Failed to load font 'arial.ttf'" << std::endl;
         // The game will just show a black screen in the error state. Ideal would be using a default SFML font, but SFML doesn't have one builtin that easily.
     } else {
-        uiManager = new UIManager(font, screenWidth, screenHeight);
+        uiManager = std::make_unique<UIManager>(font, screenWidth, screenHeight);
     }
 
     // Audio
@@ -56,51 +57,60 @@ void Game::handleEvents() {
         // --- MOUSE CLICK LOGIC ---
         if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
             if (state == Constants::GameState::MENU && uiManager) {
-                if (uiManager->isHovering(uiManager->btn1Player, mousePos)) {
-                    currentMode = Constants::GameMode::SINGLE_PLAYER;
-                    state = Constants::GameState::DIFFICULTY_SELECT;
-                }
-                if (uiManager->isHovering(uiManager->btn2Player, mousePos)) {
-                    currentMode = Constants::GameMode::MULTIPLAYER;
-                    state = Constants::GameState::NAME_ENTRY;
-                    enteringP1Name = true;
-                    p1Name = ""; p2Name = "";
-                }
-                if (uiManager->isHovering(uiManager->btnHistory, mousePos)) {
-                    state = Constants::GameState::HISTORY;
-                    currentHistoryPage = 0;
-                    loadHistoryPage();
-                }
-                if (uiManager->isHovering(uiManager->btnQuit, mousePos)) {
-                    window.close();
+                switch (uiManager->getMenuClick(mousePos)) {
+                    case MenuClick::ONE_PLAYER:
+                        currentMode = Constants::GameMode::SINGLE_PLAYER;
+                        state = Constants::GameState::DIFFICULTY_SELECT;
+                        break;
+                    case MenuClick::TWO_PLAYER:
+                        currentMode = Constants::GameMode::MULTIPLAYER;
+                        state = Constants::GameState::NAME_ENTRY;
+                        enteringP1Name = true;
+                        p1Name = ""; p2Name = "";
+                        break;
+                    case MenuClick::HISTORY:
+                        state = Constants::GameState::HISTORY;
+                        currentHistoryPage = 0;
+                        loadHistoryPage();
+                        break;
+                    case MenuClick::QUIT:
+                        window.close();
+                        break;
+                    default: break;
                 }
             }
             else if (state == Constants::GameState::DIFFICULTY_SELECT && uiManager) {
-                if (uiManager->isHovering(uiManager->btnEasy, mousePos)) {
-                    aiDifficulty = Constants::AIDifficulty::EASY;
-                    state = Constants::GameState::NAME_ENTRY;
-                    enteringP1Name = true;
-                    p1Name = ""; p2Name = "Computer";
-                }
-                if (uiManager->isHovering(uiManager->btnMedium, mousePos)) {
-                    aiDifficulty = Constants::AIDifficulty::MEDIUM;
-                    state = Constants::GameState::NAME_ENTRY;
-                    enteringP1Name = true;
-                    p1Name = ""; p2Name = "Computer";
-                }
-                if (uiManager->isHovering(uiManager->btnHard, mousePos)) {
-                    aiDifficulty = Constants::AIDifficulty::HARD;
-                    state = Constants::GameState::NAME_ENTRY;
-                    enteringP1Name = true;
-                    p1Name = ""; p2Name = "Computer";
+                switch (uiManager->getDifficultyClick(mousePos)) {
+                    case DifficultyClick::EASY:
+                        aiDifficulty = Constants::AIDifficulty::EASY;
+                        state = Constants::GameState::NAME_ENTRY;
+                        enteringP1Name = true;
+                        p1Name = ""; p2Name = "Computer";
+                        break;
+                    case DifficultyClick::MEDIUM:
+                        aiDifficulty = Constants::AIDifficulty::MEDIUM;
+                        state = Constants::GameState::NAME_ENTRY;
+                        enteringP1Name = true;
+                        p1Name = ""; p2Name = "Computer";
+                        break;
+                    case DifficultyClick::HARD:
+                        aiDifficulty = Constants::AIDifficulty::HARD;
+                        state = Constants::GameState::NAME_ENTRY;
+                        enteringP1Name = true;
+                        p1Name = ""; p2Name = "Computer";
+                        break;
+                    default: break;
                 }
             }
             else if (state == Constants::GameState::GAME_OVER && uiManager) {
-                if (uiManager->isHovering(uiManager->btnRematch, mousePos)) {
-                    startMatch();
-                }
-                if (uiManager->isHovering(uiManager->btnMenu, mousePos)) {
-                    state = Constants::GameState::MENU;
+                switch (uiManager->getGameOverClick(mousePos)) {
+                    case GameOverClick::REMATCH:
+                        startMatch();
+                        break;
+                    case GameOverClick::MENU:
+                        state = Constants::GameState::MENU;
+                        break;
+                    default: break;
                 }
             }
             else if (state == Constants::GameState::HISTORY) {
@@ -247,7 +257,7 @@ void Game::handleBallPaddleCollision(Paddle& paddle, Constants::PaddleSide side)
                 ball.changeSpeed(0.5f);
                 ball.setPosition(directionX > 0 ? pBounds.left + pBounds.width : pBounds.left - bBounds.width, bBounds.top);
                 float hitPoint = bCenterY - pCenterY;
-                ball.setVelocity(directionX * std::abs(ball.getVelocity().x), (hitPoint / 60.0f) * std::abs(ball.getVelocity().x));
+                ball.setVelocity(directionX * ball.getSpeed(), (hitPoint / 60.0f) * ball.getSpeed());
                 shakeTime = Constants::SHAKE_DURATION_HIT;
             } else {
                 // Hit the back face (ball passed paddle)
@@ -322,27 +332,26 @@ void Game::saveScore() {
 }
 
 void Game::loadHistoryPage() {
-    int totalMatches = scoreManager.getTotalMatches();
+    int totalMatches = scoreManager.getHistoryPage(currentHistoryPage * HISTORY_LIMIT, HISTORY_LIMIT, currentHistoryLines);
     totalHistoryPages = std::max(1, (int)std::ceil((float)totalMatches / HISTORY_LIMIT));
 
     if (currentHistoryPage >= totalHistoryPages) {
          currentHistoryPage = totalHistoryPages - 1;
+         scoreManager.getHistoryPage(currentHistoryPage * HISTORY_LIMIT, HISTORY_LIMIT, currentHistoryLines);
     }
-
-    currentHistoryLines = scoreManager.getHistory(currentHistoryPage * HISTORY_LIMIT, HISTORY_LIMIT);
-}
-
-float Game::getRandomFloat(float min, float max) {
-    std::uniform_real_distribution<float> dist(min, max);
-    return dist(rng);
 }
 
 void Game::render() {
     window.clear(sf::Color::Black);
 
     if (state == Constants::GameState::ERROR_STATE) {
-        // Fallback drawing if font fails to load - empty screen or simple shapes.
-        // The console will have printed the error.
+        if (uiManager) {
+            uiManager->drawError(window, "Failed to load 'arial.ttf'. Please ensure the font file is in the same folder as the executable.");
+        } else {
+            sf::RectangleShape bg(sf::Vector2f(screenWidth, screenHeight));
+            bg.setFillColor(sf::Color::Red);
+            window.draw(bg);
+        }
         window.display();
         return;
     }
@@ -350,7 +359,7 @@ void Game::render() {
     // Apply Screen Shake
     if (state == Constants::GameState::PLAYING && shakeTime > 0) {
         sf::View shakeView = defaultView;
-        shakeView.move(getRandomFloat(-5, 5), getRandomFloat(-5, 5));
+        shakeView.move(Utils::randomFloat(rng, -5, 5), Utils::randomFloat(rng, -5, 5));
         window.setView(shakeView);
     }
 
@@ -380,8 +389,4 @@ void Game::render() {
     }
 
     window.display();
-}
-
-Game::~Game() {
-    delete uiManager;
 }

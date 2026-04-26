@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <random>
+#include <memory>
 
 #include "Constants.h"
 #include "Ball.h"
@@ -16,7 +17,7 @@
 class Game {
 public:
     Game(float width, float height, sf::RenderWindow& window);
-    ~Game();
+    ~Game() = default;
     void run();
 
 private:
@@ -30,7 +31,7 @@ private:
     sf::Sound hitSound, scoreSound;
 
     // Managers
-    UIManager* uiManager;
+    std::unique_ptr<UIManager> uiManager;
     ScoreManager scoreManager;
 
     // Entities
@@ -70,5 +71,4 @@ private:
     void startMatch();
     void saveScore();
     void loadHistoryPage();
-    float getRandomFloat(float min, float max);
 };

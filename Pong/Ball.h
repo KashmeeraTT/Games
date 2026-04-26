@@ -20,6 +20,7 @@ public:
     void setPosition(float x, float y);
     sf::Vector2f getPosition() const;
     sf::Vector2f getVelocity() const;
+    float getSpeed() const;
 
 private:
     sf::RectangleShape shape;
