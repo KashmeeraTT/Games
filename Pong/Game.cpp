@@ -189,9 +189,10 @@ void Game::update() {
 
         int substeps = static_cast<int>(std::ceil(ball.getSpeed() / 10.0f));
         substeps = std::max(1, substeps);
+        float fraction = 1.0f / static_cast<float>(substeps);
 
         for (int i = 0; i < substeps; i++) {
-            ball.update(1);
+            ball.update(fraction);
             checkCollisions();
         }
 
